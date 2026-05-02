@@ -10,6 +10,7 @@
   <style>
     body { font-family: Arial; margin: 10px; }
     #calendar { max-width: 1000px; margin: auto; }
+    #error { color: red; }
   </style>
 </head>
 
@@ -17,43 +18,32 @@
 
 <h2>Youth Basketball League Schedule</h2>
 <div id="calendar"></div>
+<div id="error"></div>
 
 <script>
-async function loadGames() {
-  const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSChfiQxZOhr7xaATdHQBvTRR5NaDaPchOrzsI1ZYaZaQ53btTrNo9_oz-DANltZplfzyQKNW1KnEkC/pub?output=csv";
-
-  const response = await fetch(url);
-  const text = await response.text();
-
-  const lines = text.trim().split("\n");
-
-  const events = [];
-
-  for (let i = 1; i < lines.length; i++) {
-    const cols = lines[i].split(",");
-
-    if (cols.length < 4) continue;
-
-    const title = cols[0];
-    const date = cols[1];
-    const time = cols[2];
-    const location = cols[3];
-
-    if (!title || !date || !time) continue;
-
-    events.push({
-      title: title + " @ " + location,
-      start: date + "T" + time
-    });
-  }
-
-  return events;
-}
-
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', function() {
 
   try {
-    const events = await loadGames();
+
+    const events = [
+
+      { title: "Cavs vs Panthers @ St John Neumann", start: "2026-06-10T18:00" },
+      { title: "Sharks vs Knicks @ St John Neumann", start: "2026-06-10T18:00" },
+      { title: "Celtics vs QS @ St John Neumann", start: "2026-06-10T18:45" },
+
+      { title: "Cavs vs Sharks @ St John Neumann", start: "2026-06-17T18:00" },
+      { title: "Panthers vs Knicks @ St John Neumann", start: "2026-06-17T18:00" },
+
+      { title: "Cavs vs Knicks @ St John Neumann", start: "2026-06-24T18:00" },
+      { title: "Panthers vs Sharks @ St John Neumann", start: "2026-06-24T18:00" },
+
+      { title: "Cavs vs Celtics @ St John Neumann", start: "2026-07-01T18:00" },
+      { title: "Panthers vs QS @ St John Neumann", start: "2026-07-01T18:00" },
+
+      { title: "Cavs vs 2033 G @ St John Neumann", start: "2026-07-08T18:00" },
+      { title: "Panthers vs 2032 @ St John Neumann", start: "2026-07-08T18:00" }
+
+    ];
 
     const calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
       initialView: 'dayGridMonth',
@@ -64,7 +54,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     calendar.render();
 
   } catch (err) {
-    document.body.innerHTML += "<p style='color:red;'>Error loading schedule. Check your Google Sheets link.</p>";
+    document.getElementById("error").innerText =
+      "Calendar failed to load. Check console for errors.";
     console.error(err);
   }
 
